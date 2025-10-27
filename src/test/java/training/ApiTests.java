@@ -2,6 +2,9 @@
 package training;
 
 import org.junit.jupiter.api.Test;
+
+import models.Product;
+
 import static io.restassured.RestAssured.given;
 
 public class ApiTests {
@@ -14,7 +17,6 @@ public class ApiTests {
         // Test code for getting categories
         var response = given().when().get(BASE_URL + endpoint).then();
         response.log().body();
-
     }
 
     @Test
@@ -24,7 +26,58 @@ public class ApiTests {
         // Test code for getting products
         var response = given().queryParam("id", 2).when().get(BASE_URL + endpoint).then();
         response.log().body();
-
     }
 
+    @Test
+    public void createProduct() {
+        String endpoint = "/product/create.php";
+        String requestBody = "{\n" +
+                "  \"name\": \"Water Bottle\",\n" +
+                "  \"price\": 99.99,\n" +
+                "  \"description\": \"A large water bottle, holds 70 OZs\",\n" +
+                "  \"category_id\": 3\n" +
+                "}";
+
+        // Test code for creating a product
+        var response = given().body(requestBody).when().post(BASE_URL + endpoint).then();
+        response.log().body();
+    }
+
+    @Test
+    public void updateProduct() {
+        String endpoint = "/product/update.php";
+        String requestBody = "{\n" +
+                "  \"id\": 1000,\n" +
+                "  \"name\": \"Water Bottle 70 OZs\",\n" +
+                "  \"price\": 1000.99,\n" +
+                "  \"description\": \"A large water bottle, holds 70 OZs\",\n" +
+                "  \"category_id\": 3\n" +
+                "}";
+
+        // Test code for updating a product
+        var response = given().body(requestBody).when().put(BASE_URL + endpoint).then();
+        response.log().body();
+    }
+
+    @Test
+    public void deleteProduct() {
+        String endpoint = "/product/delete.php";
+        String requestBody = "{\n" +
+                "  \"id\": 1000\n" +
+                "}";
+
+        // Test code for deleting a product
+        var response = given().body(requestBody).when().delete(BASE_URL + endpoint).then();
+        response.log().body();
+    }
+
+    @Test
+    public void createSerializedProduct() {
+        String endpoint = "/product/create.php";
+        Product newProduct = new Product("Sports Watch", 199.99, "A waterproof sports watch", 3);
+
+        // Test code for creating a product using serialized object
+        var response = given().body(newProduct).when().post(BASE_URL + endpoint).then().statusCode(201);
+        response.log().body();
+    }       
 }
