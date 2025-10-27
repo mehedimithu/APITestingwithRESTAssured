@@ -3,6 +3,7 @@ package challenges;
 import static io.restassured.RestAssured.given;
 import org.junit.jupiter.api.Test;
 import models.Product;
+import static org.hamcrest.Matchers.equalTo;
 
 /*
  * Challenge:
@@ -21,29 +22,35 @@ public class ApiChallenge {
     public void createSweatbandProduct() {
         Product newProduct = new Product("Sweatband", 5.0, "High absorbency sweatband", 3);
 
-        var response = given().body(newProduct).when().post(BASE_URL + endpoints).then().statusCode(201);
+        var response = given().body(newProduct).when().post(BASE_URL + endpoints).then().assertThat().statusCode(201);
         response.log().body();
     }
 
     @Test
     public void updateSweatbandProduct() {
-        Product updatedProduct = new Product(1002,"Sweatband", 6.0, "High absorbency sweatband", 3);
+        Product updatedProduct = new Product(1002, "Sweatband", 6.0, "High absorbency sweatband", 3);
 
-        var response = given().body(updatedProduct).when().put(BASE_URL + "/product/update.php").then().statusCode(200);
+        var response = given().body(updatedProduct).when().put(BASE_URL + "/product/update.php").then().assertThat()
+                .statusCode(200);
         response.log().body();
     }
 
     @Test
     public void getSweatbandProduct() {
         String endpoint = "/product/read_one.php?id=1002";
-        var response = given().when().get(BASE_URL + endpoint).then().statusCode(200);
+        var body = new Product(1002, "Sweatband", 6.0, "High absorbency sweatband", 3);
+
+        var response = given().when().get(BASE_URL + endpoint).then().assertThat().statusCode(200)
+                .body("id", equalTo("1002")).body("name", equalTo(body.getName()))
+                .body("price", equalTo("6.00")).body("description", equalTo(body.getDescription()))
+                .body("category_id", equalTo(body.getCategory_id()));
         response.log().body();
     }
 
     @Test
     public void deleteSweatbandProduct() {
         String endpoint = "/product/delete.php?id=1002";
-        var response = given().when().delete(BASE_URL + endpoint).then().statusCode(200);
+        var response = given().when().delete(BASE_URL + endpoint).then().assertThat().statusCode(200);
         response.log().body();
     }
 }

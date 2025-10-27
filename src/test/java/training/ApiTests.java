@@ -1,8 +1,14 @@
 
 package training;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.everyItem;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.notNullValue;
+
 import org.junit.jupiter.api.Test;
 
+import groovyjarjarantlr4.v4.runtime.misc.NotNull;
 import models.Product;
 
 import static io.restassured.RestAssured.given;
@@ -21,11 +27,19 @@ public class ApiTests {
 
     @Test
     public void getProducts() {
-        String endpoint = "/product/read_one.php";
+        String endpoint = "/product/read.php";
 
         // Test code for getting products
-        var response = given().queryParam("id", 2).when().get(BASE_URL + endpoint).then();
+        var response = given().queryParam("id", 2).when().get(BASE_URL +
+                endpoint).then().assertThat().statusCode(200);
         response.log().body();
+
+        given().when().get(BASE_URL + endpoint).then().log().body()
+                .assertThat().statusCode(200)
+                .body("records.size()", greaterThan(0))
+                .body("records.id", everyItem(notNullValue()))
+                .body("records.name", everyItem(notNullValue()));
+
     }
 
     @Test
@@ -39,7 +53,7 @@ public class ApiTests {
                 "}";
 
         // Test code for creating a product
-        var response = given().body(requestBody).when().post(BASE_URL + endpoint).then();
+        var response = given().body(requestBody).when().post(BASE_URL + endpoint).then().assertThat().statusCode(201);
         response.log().body();
     }
 
@@ -55,7 +69,7 @@ public class ApiTests {
                 "}";
 
         // Test code for updating a product
-        var response = given().body(requestBody).when().put(BASE_URL + endpoint).then();
+        var response = given().body(requestBody).when().put(BASE_URL + endpoint).then().assertThat().statusCode(200);
         response.log().body();
     }
 
@@ -67,7 +81,7 @@ public class ApiTests {
                 "}";
 
         // Test code for deleting a product
-        var response = given().body(requestBody).when().delete(BASE_URL + endpoint).then();
+        var response = given().body(requestBody).when().delete(BASE_URL + endpoint).then().assertThat().statusCode(200);
         response.log().body();
     }
 
@@ -77,7 +91,7 @@ public class ApiTests {
         Product newProduct = new Product("Sports Watch", 199.99, "A waterproof sports watch", 3);
 
         // Test code for creating a product using serialized object
-        var response = given().body(newProduct).when().post(BASE_URL + endpoint).then().statusCode(201);
+        var response = given().body(newProduct).when().post(BASE_URL + endpoint).then().assertThat().statusCode(201);
         response.log().body();
-    }       
+    }
 }
