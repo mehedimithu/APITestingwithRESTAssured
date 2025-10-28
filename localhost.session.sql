@@ -1,5 +1,5 @@
 SELECT * 
 FROM products
-WHERE id= 1002
+WHERE id = 2;
 
 

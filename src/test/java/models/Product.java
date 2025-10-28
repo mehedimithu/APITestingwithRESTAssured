@@ -8,8 +8,19 @@ public class Product {
     private double price;
     private String description;
     private int category_id;
+    private String category_name;
 
     public Product() {
+    }
+
+    // get product with category name
+    public Product(int id, String name, double price, String description, int category_id, String category_name) {
+        setId(id);
+        setName(name);
+        setPrice(price);
+        setDescription(description);
+        setCategory_id(category_id);
+        setCategory_name(category_name);
     }
 
     // User for post request
@@ -36,6 +47,14 @@ public class Product {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getCategory_name() {
+        return category_name;
+    }
+
+    public void setCategory_name(String category_name) {
+        this.category_name = category_name;
     }
 
     public String getName() {

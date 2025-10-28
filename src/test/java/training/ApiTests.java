@@ -5,12 +5,10 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.notNullValue;
-
+import static org.hamcrest.Matchers.samePropertyValuesAs;
 import org.junit.jupiter.api.Test;
-
-import groovyjarjarantlr4.v4.runtime.misc.NotNull;
+import org.hamcrest.MatcherAssert;
 import models.Product;
-
 import static io.restassured.RestAssured.given;
 
 public class ApiTests {
@@ -27,14 +25,15 @@ public class ApiTests {
 
     @Test
     public void getProducts() {
-        String endpoint = "/product/read.php";
+        String endpoint = "/product/read_one.php";
+        String endpointForAllProducts = "/product/read.php";
 
         // Test code for getting products
         var response = given().queryParam("id", 2).when().get(BASE_URL +
                 endpoint).then().assertThat().statusCode(200);
         response.log().body();
 
-        given().when().get(BASE_URL + endpoint).then().log().body()
+        given().when().get(BASE_URL + endpointForAllProducts).then().log().body()
                 .assertThat().statusCode(200)
                 .body("records.size()", greaterThan(0))
                 .body("records.id", everyItem(notNullValue()))
@@ -93,5 +92,19 @@ public class ApiTests {
         // Test code for creating a product using serialized object
         var response = given().body(newProduct).when().post(BASE_URL + endpoint).then().assertThat().statusCode(201);
         response.log().body();
+    }
+
+    @Test
+    public void deSerializeProduct() {
+        String endpoint = "/product/read_one.php";
+
+        Product expectedProduct = new Product(2, "Cross-Back Training Tank", 299.0, "The most awesome phone of 2013!",
+                2, "Active Wear - Women");
+
+        // Test code for deserializing a product
+        Product product = given().queryParam("id", 2).when().get(BASE_URL + endpoint).then().assertThat()
+                .statusCode(200).extract().as(Product.class);
+
+        MatcherAssert.assertThat(product, samePropertyValuesAs(expectedProduct));
     }
 }
